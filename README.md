@@ -24,7 +24,8 @@ This bash script performs the following tasks:
 
 - Parses command-line options for flexible configuration.
 - Validates the existence of the backup folder and the backup location.
-- Compresses the backup folder into a timestamped tar.gz archive.
+- Compresses the backup folder into a [folder]-[UTC-date].tar.gz (e.g., data-2023-10-01-12-30-45.tar.gz) archive.
+- Optional exclude option to exclude the logs file when compressing the folder
 - Optionally uploads the archive to an AWS S3 bucket if provided.
 - Keeps a specified number of backups by deleting older files.
 
@@ -104,19 +105,16 @@ To display the help message:
 
 ---
 
-## Error Codes
+## Expected Errors & Fixes
 
-The script exits with the following error codes on failure:
-
-- **1:** General usage error (invalid option or failure in parsing arguments).
-- **2:** The `--nofiles` parameter is not a numeric value.
-- **3:** The `--folder` parameter is missing (required).
-- **4:** The specified backup folder does not exist.
-- **5:** The specified backup location does not exist.
-- **6:** Failed to change directory to the backup folder's parent directory.
-- **7:** Compression (tar command) failed.
-- **8:** AWS CLI is not installed (required for S3 upload).
-- **9:** S3 upload failed.
+| Error Code | Error Message                           | Probable Cause                            | Solution                                                |
+| ---------- | --------------------------------------- | ----------------------------------------- | ------------------------------------------------------- |
+| 2          | `--nofiles must be numeric`             | Non-numeric value provided.               | Use e.g., `--nofiles 5`                                 |
+| 3          | `--folder is required`                  | Missing mandatory `-f/--folder` argument. | Specify source folder: `-f /path/to/data`               |
+| 4/5        | `Backup folder/location does not exist` | Invalid directory path.                   | Verify paths exist and permissions are granted.         |
+| 7          | `Backup failed`                         | `tar` compression error.                  | Check folder permissions/disk space.                    |
+| 8          | `AWS CLI not installed`                 | Missing AWS CLI when using S3 upload.     | Install AWS CLI or omit `-b/--bucket` option.           |
+| 9          | `Failed to upload to S3`                | Invalid bucket name/permissions.          | Validate bucket exists and IAM permissions are correct. |
 
 ---
 
